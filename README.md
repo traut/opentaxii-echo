@@ -1,6 +1,6 @@
 # opentaxii-echo
 
-Simple Echo implementation of OpenTAXII Persistence API
+### Simple Echo implementation of OpenTAXII Persistence API.
 
 State of a TAXII server is defined by state parameters in a GET query. For example, Discovery request sent to 
 ```
@@ -12,7 +12,7 @@ Supported state parameters:
 
 |        parameter         |                value                             |               example                         |
 |--------------------------|--------------------------------------------------|-----------------------------------------------|
-| ``services``             | comma separated list of active services          | ``services=collection_management,discovery``  |
+| ``services``             | comma separated list of active services. Supported values are ``poll``, ``inbox``, ``collection_management``, ``discovery``          | ``services=collection_management,discovery``  |
 | ``discovery_advertised`` | comma separated list of advertised services      | ``discovery_advertised=poll,inbox,discovery`` |
 | ``*_address``            | service address; ``*`` replaced with a service   | ``inbox_address=/service/inbox``              |
 | ``*_description``        | service description; ``*`` replaced with a service | ``poll_description=TestDescription``          |
