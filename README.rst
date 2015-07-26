@@ -10,7 +10,9 @@ State of a TAXII server is defined by state parameters in a GET query. For examp
 
 will return Discovery response with 2 services advertised: Poll and Inbox.
 
-.. list-table:: Supported state parameters
+Supported state parameters:
+
+.. list-table::
     :header-rows: 1
 
     * - Parameter
