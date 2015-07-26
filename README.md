@@ -22,22 +22,19 @@ Supported state parameters:
 | ``return_blocks``        | how many content block to return in Poll response  | ``return_blocks=10`` |
 
 Example discovery request:
-```
-#!/bin/bash
+```bash
 
 taxii-discovery --path "http://localhost:9000/discovery/?services=poll,inbox,collection_management,discovery&discovery_advertised=inbox,poll&inbox_address=/some/inbox&poll_description=dummy-description"
 ```
 
 Example Collection Management request:
-```
-#!/bin/bash
+```bash
 
 taxii-collections --path "http://localhost:9000/collections/?services=poll,inbox,collection_management,discovery&discovery_advertised=inbox,poll&collection_management_address=/collections/&inbox_address=/some/inbox&poll_description=WHAT?&collections=aaa,bbb,ccc&aaa_supported_content=foo,bar&aaa_count=123&bbb_count=999"
 ```
 
 Example Poll request:
-```
-#!/bin/bash
+```bash
 
 taxii-poll --path "http://localhost:9000/poll/?services=poll,inbox,collection_management,discovery&discovery_advertised=inbox,poll&collection_management_address=/collections/&inbox_address=/some/inbox&poll_description=WHAT?&collections=aaa,bbb,ccc&aaa_supported_content=foo,bar&aaa_count=123&bbb_count=999&return_blocks=100" -c bbb
 ```
