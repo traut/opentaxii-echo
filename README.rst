@@ -11,10 +11,11 @@ State of a TAXII server is defined by state parameters in a GET query. For examp
 will return Discovery response with 2 services advertised: Poll and Inbox.
 
 .. list-table:: Supported state parameters
+    :header-rows: 1
 
-    * - parameter
-      - value
-      - example
+    * - Parameter
+      - Value
+      - Example
     * - ``services``
       - comma separated list of active services. Supported values are ``poll``, ``inbox``, ``collection_management``, ``discovery``
       - ``services=collection_management,discovery``
@@ -40,7 +41,7 @@ will return Discovery response with 2 services advertised: Poll and Inbox.
       - how many content block to return in Poll response
       - ``return_blocks=10``
 
-Using `Cabby <https://pypi.python.org/pypi/cabby>`_  TAAXII client, the requests can look like:
+Using `Cabby <https://pypi.python.org/pypi/cabby>`_  TAXII client, the requests can look like:
 
 * Discovery request:
 
