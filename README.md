@@ -17,8 +17,8 @@ Supported state parameters:
 | ``*_address``            | service address; ``*`` replaced with a service   | ``inbox_address=/service/inbox``              |
 | ``*_description``        | service description; ``*`` replaced with a service | ``poll_description=TestDescription``          |
 | ``collections``          | comma separated list of the collection names    | ``collections=collection-a,collection-b``     |
-| ``*_supported_content``  | comma separated list of supported content bindings for a collection  | ``collection-a_supported_content=foo,bar`` |
-| ``*_count``              | blocks count for a collection  | ``collection-a_count=100&bbb_count=1`` |
+| ``*_supported_content``  | comma separated list of supported content bindings for a collection; ``*`` replaced with a collection name  | ``collection-a_supported_content=foo,bar`` |
+| ``*_count``              | blocks count for a collection; ``*`` replaced with a collection name  | ``collection-a_count=100&bbb_count=1`` |
 | ``return_blocks``        | how many content block to return in Poll response  | ``return_blocks=10`` |
 
 Example discovery request:
