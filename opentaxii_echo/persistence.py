@@ -151,16 +151,14 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
     def get_content_blocks(self, collection_id, start_time=None, end_time=None,
                            bindings=[], offset=0, limit=None):
 
-        blocks_count = int(self.config.get('blocks_count', 0))
+        return_blocks = int(self.config.get('return_blocks', 0))
         blocks = []
-        for i in range(0, blocks_count):
-
+        for i in range(0, return_blocks):
             content_binding = self.config.get('binding', 'dummy-binding')
 
-            timestamp = datetime.utcnow().replace(tzinfo=pytz.UTC)
             blocks.append(ContentBlockEntity(
-                content="CONTENT-BLOCK-{}".format(str(uuid.uuid4())),
-                timestamp_label=timestamp,
+                content="CONTENT-BLOCK-{}".format(i),
+                timestamp_label=datetime.utcnow().replace(tzinfo=pytz.UTC),
                 content_binding=ContentBindingEntity(content_binding)
             ))
 
