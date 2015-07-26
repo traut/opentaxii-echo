@@ -1,0 +1,4 @@
+---
+persistence_api:
+  class: opentaxii_echo.persistence.EchoPersistenceAPI
+  parameters:
