@@ -45,7 +45,7 @@ Supported state parameters:
       - how many content block to return in Poll response
       - ``return_blocks=10``
     * - ``binding``
-      - content binding of content blocks returned
+      - content binding of the content blocks to return
       - ``binding=urn:stix.mitre.org:xml:1.1.1``
 
 Using `Cabby <https://pypi.python.org/pypi/cabby>`_  TAXII client, the requests can look like:
