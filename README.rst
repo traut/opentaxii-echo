@@ -4,7 +4,9 @@ opentaxii-echo
 Simple Echo implementation of OpenTAXII Persistence API.
 --------------------------------------------------------
 
-Echo Persistence API is fully stateless implementation of OpenTAXII Persistence API. The state of a TAXII server is defined by state parameters in a GET query.
+Echo Persistence API is fully stateless implementation of OpenTAXII Persistence API.
+The state of a TAXII server is defined by state parameters in a GET query.
+Default values are defined in a configuration file `opentaxii-config.yml <https://github.com/traut/opentaxii-echo/blob/master/opentaxii-config.yml>`_.
 
 For example, Discovery request sent to::
 
