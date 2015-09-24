@@ -1,11 +1,13 @@
+from datetime import datetime
+import inspect
+
 import structlog
 import uuid
-import inspect
 import pytz
-from datetime import datetime
-
-from flask import request, abort
-from libtaxii.constants import VID_TAXII_HTTP_10
+import requests
+from werkzeug.datastructures import MultiDict
+from flask import request, abort, current_app
+from libtaxii.constants import VID_TAXII_HTTP_10, CB_STIX_XML_111
 
 from opentaxii.server import TAXIIServer
 from opentaxii.taxii.services.abstract import TAXIIService
@@ -19,6 +21,11 @@ from opentaxii.taxii.entities import (
 log = structlog.getLogger(__name__)
 
 
+def normalize(config, key):
+    if (config.get(key) and isinstance(config[key], basestring)):
+        config[key] = map(lambda s: s.lower(), config[key].split(','))
+
+
 class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
 
     def __init__(self):
@@ -26,18 +33,25 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
 
     @property
     def config(self):
-        if not request.args:
-            log.error("request.no_arguments")
-            abort(405)
-        return request.args
+        config = dict(current_app.taxii.config)
+
+        for arg in request.args:
+            config[arg] = request.args.get(arg)
+
+        if (config.get('services')
+                and isinstance(config['services'], basestring)):
+            config['services'] = map(lambda s: s.lower(),
+                                     config['services'].split(','))
+        normalize(config, 'services')
+        normalize(config, 'collection_names')
+        normalize(config, 'discovery_advertised')
+
+        return config
 
     def get_services(self, collection_id=None):
 
-        service_types = map(lambda s: s.lower(),
-                            self.config.get('services', '').split(','))
-
         services = []
-        for service_type in service_types:
+        for service_type in self.config.get('services', []):
             if service_type not in TAXIIServer.TYPE_TO_SERVICE:
                 log.error("service.type.unknown", service_type=service_type)
                 abort(405)
@@ -56,9 +70,7 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
             }
 
             for arg in args:
-                value = self.config.get(
-                    '{}_{}'.format(service_type, arg))
-
+                value = self.config.get('{}_{}'.format(service_type, arg))
                 if value:
                     properties[arg] = value
 
@@ -68,7 +80,6 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
                 properties=properties
             )
             if service_type == 'discovery':
-
                 service.properties['advertised_services'] = \
                     self.config.get('discovery_advertised', [])
 
@@ -90,7 +101,7 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
 
     def get_result_set(self, result_set_id):
 
-        content_binding = self.config.get('binding', 'dummy-binding')
+        content_binding = self.config.get('binding', CB_STIX_XML_111)
 
         class DummyCollection(object):
             def __ne__(self, other):
@@ -105,15 +116,14 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
 
     def get_collections(self, service_id):
 
-        collection_names = self.config.get('collections', '').split(',')
-
         collections = []
-        for name in collection_names:
+        for name in self.config.get('collection_names', []):
 
             content_type_key = '{}_supported_content'.format(name)
-            content_types = (self.config
-                                 .get(content_type_key, '')
-                                 .split(','))
+            content_types = map(lambda x: x.lower(),
+                                self.config
+                                    .get(content_type_key, '')
+                                    .split(','))
 
             collection = CollectionEntity(
                 id=name,
@@ -121,12 +131,16 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
                 available=True,
                 supported_content=content_types,
                 accept_all_content=True,
+                volume=0,
             )
             collections.append(collection)
 
         return collections
 
     def get_collection(self, collection_name, service_id):
+
+        if collection_name not in self.config.get('collection_names', []):
+            return None
 
         content_type_key = '{}_supported_content'.format(collection_name)
         content_types = (self.config
@@ -139,6 +153,7 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
             available=True,
             supported_content=content_types,
             accept_all_content=True,
+            volume=0,
         )
 
     def create_inbox_message(self, inbox_message_entity):
@@ -146,18 +161,59 @@ class EchoPersistenceAPI(OpenTAXIIPersistenceAPI):
 
     def get_content_blocks_count(self, collection_id, start_time=None,
                                  end_time=None, bindings=[]):
+
         return int(self.config.get('{}_count'.format(collection_id), 0))
+
+    def _get_cosive_content(self, version):
+
+        url = 'https://api.cosive.com/sdg/v1/stix'
+
+        objects = self.config.get('cosive_objects')
+        count = int(self.config.get('cosive_count', 1))
+
+        r = requests.get(url, params={
+            version: version,
+            objects: objects,
+            count: count
+        })
+
+        if r.status_code != 200:
+            log.error("cosive.response.status_code",
+                      status_code=r.status_code, response=r.text)
+            return None
+
+        return r.text
+
 
     def get_content_blocks(self, collection_id, start_time=None, end_time=None,
                            bindings=[], offset=0, limit=None):
 
-        return_blocks = int(self.config.get('return_blocks', 0))
+        content_blocks = int(self.config.get('content_blocks', 0))
+        content_binding = self.config.get('binding', CB_STIX_XML_111)
+
+        use_cosive = str(self.config.get('use_cosive', "true"))
+        use_cosive = use_cosive.lower() == "true"
+
         blocks = []
-        for i in range(0, return_blocks):
-            content_binding = self.config.get('binding', 'dummy-binding')
+
+        for i in range(0, content_blocks):
+
+            if use_cosive:
+                if content_binding == 'urn:stix.mitre.org:xml:1.1.1':
+                    version = '1.1.1'
+                elif content_binding == 'urn:stix.mitre.org:xml:1.2':
+                    version = '1.2'
+                else:
+                    version = None
+                    log.error("Cosive only supports STIX 1.1.1 and 1.2")
+
+            content = "CONTENT-BLOCK-{}".format(i)
+
+            if use_cosive and version:
+                content = self._get_cosive_content(version) or content
 
             blocks.append(ContentBlockEntity(
-                content="CONTENT-BLOCK-{}".format(i),
+                content=content,
                 timestamp_label=datetime.utcnow().replace(tzinfo=pytz.UTC),
                 content_binding=ContentBindingEntity(content_binding)
             ))

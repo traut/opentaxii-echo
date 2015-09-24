@@ -2,3 +2,20 @@
 persistence_api:
   class: opentaxii_echo.persistence.EchoPersistenceAPI
   parameters:
+
+use_cosive: true
+services: 
+  - discovery
+  - collection_management
+  - poll
+  - inbox
+discovery_advertised:
+  - discovery
+  - collection_management
+  - poll
+  - inbox
+collection_names:
+  - traces-of-evil-ninjas
+  - alien-encounters
+content_blocks: 2
+binding: "urn:stix.mitre.org:xml:1.1.1"

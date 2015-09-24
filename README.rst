@@ -19,34 +19,56 @@ Supported state parameters:
 
     * - Parameter
       - Value
+      - Defaults
       - Example
     * - ``services``
       - comma separated list of active services. Supported values are ``poll``, ``inbox``, ``collection_management``, ``discovery``
-      - ``services=collection_management,discovery``
+      - ``discovery``, ``collection_management``, ``poll``, ``inbox``
+      - ``?services=collection_management,discovery``
     * - ``discovery_advertised``
       - comma separated list of advertised services
-      - ``discovery_advertised=poll,inbox,discovery``
+      - ``discovery``, ``collection_management``, ``poll``, ``inbox``
+      - ``?discovery_advertised=poll,inbox,discovery``
     * - ``*_address``
       - service address; ``*`` replaced with a service
-      - ``inbox_address=/service/inbox``
+      - ``/discovery/``, ``/collection_management/``, ``/poll/``, ``/inbox/``
+      - ``?inbox_address=/service/inbox``
     * - ``*_description``
       - service description; ``*`` replaced with a service
-      - ``poll_description=TestDescription``
+      - 
+      - ``?poll_description=TestDescription``
     * - ``collections``
       - comma separated list of the collection names
-      - ``collections=collection-a,collection-b``
+      - ``alien-encounters``, ``traces-of-evil-ninjas``
+      - ``?collections=collection-a,collection-b``
     * - ``*_supported_content``
       - comma separated list of supported content bindings for a collection; ``*`` replaced with a collection name
-      - ``collection-a_supported_content=foo,bar``
+      - 
+      - ``?collection-a_supported_content=foo,bar``
     * - ``*_count``
       - blocks count for a collection; ``*`` replaced with a collection name
-      - ``collection-a_count=100&bbb_count=1``
-    * - ``return_blocks``
-      - how many content block to return in Poll response
-      - ``return_blocks=10``
+      - 0
+      - ``?collection-a_count=100&bbb_count=1``
+    * - ``use_cosive``
+      - Use `Cosive <http://cosive.com>`_ free STIX API to fill content blocks with STIX packages.
+      - ``true``
+      - ``?use_cosive=no``
+    * - ``cosive_objects``
+      - Specify what objets should Cosive API put in STIX. See https://generator.cosive.com/ for details.
+      -
+      - ``?cosive_objects=url,domain``
+    * - ``cosive_count``
+      - Specify how many objects put into STIX package. See https://generator.cosive.com/ for details.
+      -
+      - ``?cosive_count=1``
+    * - ``content_blocks``
+      - how many content block to return in Poll response.
+      - 2
+      - ``?conent_blocks=10``
     * - ``binding``
       - content binding of the content blocks to return
-      - ``binding=urn:stix.mitre.org:xml:1.1.1``
+      - ``urn:stix.mitre.org:xml:1.1.1``
+      - ``?binding=urn:stix.mitre.org:xml:1.1.1``
 
 Using `Cabby <https://pypi.python.org/pypi/cabby>`_  TAXII client, the requests can look like:
 
