@@ -1,22 +1,18 @@
-FROM python:2.7.9
+FROM intelworks/opentaxii
 
-VOLUME [ "/input" ]
-WORKDIR /input
-
+# Install Requirements
 COPY ./requirements.txt requirements.txt
-
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt \
     && rm -f requirements.txt \
-		&& mkdir /install_dir 
+    && mkdir /install_dir 
 
+# Setup Echo Persistence API
 COPY ./ /install_dir
 RUN cd /install_dir \
     && python setup.py install \
-		&& cd / \
+    && cd / \
     && rm -rf /install_dir
 
-EXPOSE  9000 
-COPY ./opentaxii-config.yml opentaxii-config.yml
-ENV OPENTAXII_CONFIG=opentaxii-config.yml 
-CMD [ "opentaxii-run-dev" ]
+# Set Default Configuration
+COPY ./opentaxii-config.yml /input/opentaxii.yml

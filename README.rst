@@ -122,10 +122,11 @@ And then run the container using:
 .. code-block:: bash
      docker run -d -p 9000:9000 opentaxii-echo
 
-or, using an updated configuration found in the current directory:
+or, if you want to use your own configuration, you need to create a file called: opentaxii.yml, and pass
+the directory in which it is stored as a volume (e.g. the ${PWD}/config directory):
 
 .. code-block:: bash
-     docker run -d -p 9000:9000 -v "${PWD}:/input:ro"  opentaxii-echo
+     docker run -d -p 9000:9000 -v "${PWD}/config:/input:ro"  opentaxii-echo
 
 
 
