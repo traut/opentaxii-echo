@@ -109,3 +109,25 @@ Body of ``opentaxii-config.yml`` can be:
     persistence_api:
       class: opentaxii_echo.persistence.EchoPersistenceAPI
       parameters:
+
+Using Docker
+---------------
+To run a docker container, you can use the default configuration and build the container locally:
+
+.. code-block:: bash
+     docker build -t opentaxii-echo .
+
+And then run the container using:
+
+.. code-block:: bash
+     docker run -d -p 9000:9000 opentaxii-echo
+
+or, if you want to use your own configuration, you need to create a file called: opentaxii.yml, and pass
+the directory in which it is stored as a volume (e.g. the ${PWD}/config directory):
+
+.. code-block:: bash
+     docker run -d -p 9000:9000 -v "${PWD}/config:/input:ro"  opentaxii-echo
+
+
+
+
